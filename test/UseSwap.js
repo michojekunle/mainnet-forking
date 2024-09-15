@@ -33,10 +33,10 @@ describe("UseSwap", function () {
       await helpers.impersonateAccount(TOKEN_HOLDER);
       const impersonatedSigner = await ethers.getSigner(TOKEN_HOLDER);
 
+      // get contract to interact with the amountsIn function
       const RouterContract = await ethers.getContractAt('IUniswapV2Router', ROUTER_ADDRESS, impersonatedSigner);
 
       const amountOut = ethers.parseUnits("20", 18);
-      // const amountInMax = ethers.parseUnits("1000", 6);
       // using amountsIn function of the uniswap v2 router get the amountsIn(USDC) required for the amountOut(DAI)
       const amounts = await RouterContract.getAmountsIn(amountOut, [USDC, DAI]);
       let amountInMax = amounts[0];
