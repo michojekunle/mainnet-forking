@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-interface IUniswap {
+interface IUniswapV2Router {
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
@@ -36,6 +36,8 @@ interface IUniswap {
         address to,
         uint deadline
     ) external returns (uint amountA, uint amountB, uint liquidity);
+
+    function getAmountsIn(uint amountOut, address[] memory path) external view returns (uint[] memory amounts);
 }
 
 interface IUniswapV2Factory {
