@@ -39,7 +39,10 @@ describe("UseSwap", function () {
       // const amountInMax = ethers.parseUnits("1000", 6);
       // using amountsIn function of the uniswap v2 router get the amountsIn(USDC) required for the amountOut(DAI)
       const amounts = await RouterContract.getAmountsIn(amountOut, [USDC, DAI]);
-      const amountInMax = amounts[0];
+      let amountInMax = amounts[0];
+
+      // Increase slippage tolerance (e.g., allow 5% slippage)
+      amountInMax = amountInMax * BigInt(105) / BigInt(100);
 
       const USDC_Contract = await ethers.getContractAt("IERC20", USDC, impersonatedSigner);
       const DAI_Contract = await ethers.getContractAt("IERC20", DAI);
@@ -52,7 +55,10 @@ describe("UseSwap", function () {
       tx.wait();
 
       const amounts2 = await RouterContract.getAmountsIn(amountOut, [USDC, DAI]);
-      const amountInMax2 = amounts2[0];
+      let amountInMax2 = amounts2[0];
+
+      // Increase slippage tolerance (e.g., allow 5% slippage)
+      amountInMax2 = amountInMax2 * BigInt(105) / BigInt(100);
 
       await USDC_Contract.approve(useSwap, amountInMax2);
       
