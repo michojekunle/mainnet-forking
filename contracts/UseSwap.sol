@@ -4,7 +4,6 @@ import "./interfaces/IUniswapV2Router.sol";
 import "./interfaces/IERC20.sol";
 
 contract UseSwap {
-
     address public uniswapRouter;
     address public owner;
     uint public swapCount;
@@ -26,7 +25,7 @@ contract UseSwap {
 
         require(IERC20(path[0]).approve(uniswapRouter, amountInMax), "approve failed.");
         
-        IUniswapV2Router(uniswapRouter).swapTokensForExactTokens(
+        IUniswapV2Router01(uniswapRouter).swapTokensForExactTokens(
             amountOut,
             amountInMax,
             path,
