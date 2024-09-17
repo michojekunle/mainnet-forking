@@ -5,10 +5,13 @@ const V2_PAIR_ADDRESS = "0x3356c9A8f40F8E9C1d192A4347A76D18243fABC5";
 const ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 const FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 
-const TOKEN_HOLDER = "0x23f4569002a5A07f0Ecf688142eEB6bcD883eeF8";
+const TOKEN_HOLDER = "0xf584F8728B874a6a5c7A8d4d387C9aae9172D621";
+const TOKEN_HOLDER_RE = "0x23f4569002a5A07f0Ecf688142eEB6bcD883eeF8";
 
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+// const WETH = "";
+
 
 const constants = async () => {
   await helpers.impersonateAccount(TOKEN_HOLDER);
@@ -44,6 +47,9 @@ const constants = async () => {
     impersonatedSigner
   );
 
+  const WETH = await ROUTER.WETH();
+  const feeData = await ethers.provider.getFeeData();
+
   return {
     impersonatedSigner,
     USDC_CONTRACT,
@@ -53,6 +59,8 @@ const constants = async () => {
     V2_PAIR,
     DAI_CONTRACT,
     USDC_CONTRACT,
+    WETH,
+    feeData,
   };
 };
 
@@ -66,9 +74,9 @@ const addLiquidity = async (
   to,
   deadline
 ) => {
-    const { ROUTER } = await constants();
+  const { ROUTER, feeData } = await constants();
   try {
-    await ROUTER.addLiquidity(
+    const res = await ROUTER.addLiquidity(
       tokenA,
       tokenB,
       amountADesired,
@@ -76,18 +84,94 @@ const addLiquidity = async (
       amountAMin,
       amountBMin,
       to,
-      deadline
+      deadline,
+      {
+        maxFeePerGas: feeData.maxFeePerGas,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+      }
     );
+    return res;
   } catch (error) {
     return error;
   }
 };
 
-const removeLiquidity = async () => {};
+const removeLiquidity = async (
+  tokenA,
+  tokenB,
+  liquidity,
+  amountAMin,
+  amountBMin,
+  to,
+  deadline
+) => {
+  const { ROUTER } = await constants();
 
-const addLiquidityETH = async () => {};
+  try {
+    const res = await ROUTER.removeLiquidity(
+      tokenA,
+      tokenB,
+      liquidity,
+      amountAMin,
+      amountBMin,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
-const removeLiquidityETH = async () => {};
+const addLiquidityETH = async (
+  token,
+  amountTokenDesired,
+  amountTokenMin,
+  amountETHMin,
+  to,
+  deadline,
+) => {
+  const { ROUTER } = await constants();
+
+  try {
+    const res = await ROUTER.addLiquidityETH(
+      token,
+      amountTokenDesired,
+      amountTokenMin,
+      amountETHMin,
+      to,
+      deadline,
+      { value: amountETHMin*BigInt(125)/BigInt(100)}
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+const removeLiquidityETH = async (
+  token,
+  liquidity,
+  amountTokenMin,
+  amountETHMin,
+  to,
+  deadline
+) => {
+  try {
+    const { ROUTER } = await constants();
+    const res = await ROUTER.removeLiquidityETH(
+      token,
+      liquidity,
+      amountTokenMin,
+      amountETHMin,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
 const removeLiquidityWithPermit = async () => {};
 
@@ -98,15 +182,96 @@ const removeLiquidityETHSupportingFeeOnTransferTokens = async () => {};
 const removeLiquidityETHWithPermitSupportingFeeOnTransferTokens =
   async () => {};
 
-const swapExactTokensForTokens = async () => {};
+const swapExactTokensForTokens = async (
+  amountIn,
+  amountOutMin,
+  path,
+  to,
+  deadline
+) => {
+  try {
+    const res = await ROUTER.swapExactTokensForTokens(
+      amountIn,
+      amountOutMin,
+      path,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
-const swapTokensForExactTokens = async () => {};
+const swapTokensForExactTokens = async (
+  amountOut,
+  amountInMax,
+  path,
+  to,
+  deadline
+) => {
+  try {
+    const res = await ROUTER.swapTokensForExactTokens(
+      amountOut,
+      amountInMax,
+      path,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
-const swapExactETHForTokens = () => {};
+const swapExactETHForTokens = async (amountOutMin, path, to, deadline) => {
+  try {
+    const res = await ROUTER.swapExactETHForTokens(
+      amountOutMin,
+      path,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
-const swapExactTokensForETH = async () => {};
+const swapExactTokensForETH = async (
+  amountIn,
+  amountOutMin,
+  path,
+  to,
+  deadline
+) => {
+  try {
+    const res = await ROUTER.swapExactTokensForETH(
+      amountIn,
+      amountOutMin,
+      path,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
-const swapETHForExactTokens = async () => {};
+const swapETHForExactTokens = async (amountOut, path, to, deadline) => {
+  try {
+    const res = await ROUTER.swapETHForExactTokens(
+      amountOut,
+      path,
+      to,
+      deadline
+    );
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
 const swapExactTokensForTokensSupportingFeeOnTransferTokens = async () => {};
 
@@ -137,5 +302,5 @@ module.exports = {
   swapExactTokensForTokensSupportingFeeOnTransferTokens,
   swapExactETHForTokensSupportingFeeOnTransferTokens,
   swapExactTokensForETHSupportingFeeOnTransferTokens,
-  constants
+  constants,
 };
